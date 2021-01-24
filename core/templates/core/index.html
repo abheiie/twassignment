@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+
+
+<body>
+    <script>
+        var search_query = document.getElementById("search_query").value;
+        console.log(search_query);
+        localStorage.setItem('search_query', search_query);
+    </script>
+
+
+    <div class="container">
+
+        <div style="margin-top: 40px;">
+
+            <div class="row text-center">
+                <div class="col-2">
+                </div>
+                <div class="col-6">
+                    <form action="/" method="post" id="search_question">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input id="search_query" name="search_query" type="text" class="form-control"
+                                placeholder="Search.." aria-label="search" aria-describedby="button-addon2" required>
+                            <button class="btn btn-outline-secondary" type="submit" id="search_question_button">
+                                Search
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="tag">tag</span>
+                                    <input placeholder="search within a tag" name="tag" type="text" class="form-control"
+                                        aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                </div>
+
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">user</span>
+                                    <input placeholder="user's id who must own question" name="user" type="text"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">url</span>
+                                    <input placeholder="url, must be contained in a post" name="url" type="text"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">body</span>
+                                    <input placeholder="text must appear in ques's bodies." name="body" type="text"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">answers</span>
+                                    <input placeholder="min no. of answers must have" name="answers" type="number"
+                                        min="0" class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">title</span>
+                                    <input placeholder="text must appear in questions' titles." name="title" type="text"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">nottagged</span>
+                                    <input placeholder="should not be present on ques." name="nottagged" type="text"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">views</span>
+                                    <input placeholder="the minimum number of views" name="views" type="number" min="0"
+                                        class="form-control" aria-label="Sizing example input"
+                                        aria-describedby="inputGroup-sizing-sm">
+                                </div>
+                                <input type="hidden" id="is_from_search_field" name="is_from_search_field" value="true">
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-2">
+
+        </div>
+        <div class="col-6">
+            <div class="result">
+
+                {% if status %}
+                {{status}}
+                {% elif items_not_present %}
+                <div class="alert alert-danger" role="alert">
+                    No items found please try again with some other keyword
+                </div>
+                {% else %}
+
+                {% for i in response.items %}
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">{{i.title}}</p>
+                        <a href={{i.link}} class="card-link"> {{i.link}} </a>
+                    </div>
+                </div>
+                <br>
+                {% endfor%}
+
+                {% if show_pagination %}
+
+
+
+                <nav aria-label="Page navigation example">
+
+                    <ul class="pagination">
+
+                        {% if not is_first_page %}
+                        <li class="page-item">
+                            <form method="post" action="/" class="inline" id="pagination_prev">
+                                {% csrf_token %}
+                                <input type="hidden" name="prev_page" value="true">
+                                <button type="submit" name="submit_param" value="submit_prev_value" class="link-button"
+                                    id="prev_page_button">
+                                    prev
+                                </button>
+                            </form>
+                            {% endif %}
+                        </li>
+                        <li class="page-item">
+                            {% if not is_last_page %}
+                            <form method="post" action="/" class="inline" id="pagination_next">
+                                {% csrf_token %}
+                                <input type="hidden" name="next_page" value="true">
+                                <button type="submit" name="submit_param" value="submit_next_value" class="link-button"
+                                    id="next_page_button">
+                                    next
+                                </button>
+                            </form>
+                            {% endif %}
+                        </li>
+                        <li class="page-item">
+                            &nbsp; showing page {{page_no}} of {{total_pages}}
+                        </li>
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% if showsearchresulttitle %}
+                <div class="alert alert-warning" role="alert">
+                    Search limit per minute is 5 and per day is 100 for each session.
+                </div>
+                <br>
+                {% endif %}
+                {% endif %}
+            </div>
+            <br>
+
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+    -->
+</body>
+
+</html>
