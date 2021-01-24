@@ -14,21 +14,16 @@ def search_question(request):
         """
         get the POST request
         """
-        is_request_allowable_for_per_day = None
-        is_request_allowable_for_per_minute = None
-
+        
         is_request_allowable_for_per_day = check_number_of_request_per_day(request)
         is_request_allowable_for_per_minute = check_number_of_request_per_minute(request)
-
-        print(is_request_allowable_for_per_day, is_request_allowable_for_per_minute)
 
         if is_request_allowable_for_per_minute and is_request_allowable_for_per_day:
             """
             request is allowable for this minute as well as this day
             """
-            print("***********inside the is_request_allowable_for_per_minute and is_request_allowable_for_per_day:")
 
-            # return data varianle 
+            # returnable data varianles 
             response = None
             total = None
             showing_page_number = None
@@ -40,7 +35,6 @@ def search_question(request):
             url = None
             is_first_page = None
             is_last_page = None
-
 
             # get the data from form 
             query = (str(request.POST.get('search_query','')).strip()).replace(" ", "%20")
@@ -56,16 +50,7 @@ def search_question(request):
             next_page = request.POST.get('next_page','')
             prev_page = request.POST.get('prev_page','')
 
-
-            
-            print("is_from_search_field------------------>", is_from_search_field)
-            print("next_page------------------>", next_page)
-            print("prev_page------------------>", prev_page)
-
-
-
-
-            #pagination work
+            # check if request is coming from search field or pagination button
             if is_from_search_field == "true":
                 page = str(1)
                 request.session['page'] = "1"
@@ -73,81 +58,52 @@ def search_question(request):
                 request.session['current_url'] = url
                 is_first_page = True
                 
-
-
-            # from next page
+            # check if request is coming from "next" pagination button
             if next_page == "true":
                 page = request.session.get('page')
                 request.session['page'] = str(int(request.session.get('page'))+1)
                 url = request.session.get('current_url')
-
                 first_part_url = url[:55]
                 first_and = int(url.find("&"))
                 last_part_url = url[first_and:]
                 middle_part_url = request.session['page']
                 url = first_part_url+middle_part_url+last_part_url
-                print(url)
 
-            # for previous page
+           # check if request is coming from "prev" pagination button
             if prev_page == "true":
                 page = request.session.get('page')
                 request.session['page'] = str(int(request.session.get('page'))-1)
                 url = request.session.get('current_url')
-
                 first_part_url = url[:55]
                 first_and = int(url.find("&"))
                 last_part_url = url[first_and:]
                 middle_part_url = request.session['page']
                 url = first_part_url+middle_part_url+last_part_url
-                print(url)
-
-
-
-
-
-
-
-                # https://api.stackexchange.com/2.2/search/advanced?page=1&pagesize=10&order=desc&sort=votes&views=&body=&url=&user=&q=csrf%20token%20error&title=&tagged=&answers=&site=stackoverflow
-
-                print(" from next page -------->", url)
-
-
-
-            print("url--"*40, url)
-
 
             urlkey = url
 
             if cache.get(urlkey) == None:
-
-                print("************ inside cache.get(urlkey) == None: ")
-
                 url_to_get_total = url+"&filter=total"
                 response = requests.get(url).json()
                 total = requests.get(url_to_get_total).json()
                 total = total.get("total")
-                
-
                 urlvalue = {
                     "response":response,
                     "total":total
                 }
                 cache.set(urlkey, urlvalue, None)
-                print("===========cache.get(urlkey)=============>", cache.get(urlkey))
-
             else:
-
-                print("############## inside cache.get(urlkey) == not None: ")
                 cached_data = cache.get(urlkey) 
                 response = cached_data["response"]
                 total = cached_data["total"]
 
+            #check if atleast single item present in response
             if int(total) == 0:
                 items_not_present = True
 
+            # count total number of pages
             total_pages = int(total) // pagesize
 
-            
             # check for last page
             if int(request.session['page']) == int(total_pages):
                 is_last_page = True
@@ -166,12 +122,6 @@ def search_question(request):
                 "is_first_page": is_first_page,
                 "is_last_page":is_last_page,
             }
-
-
-
-            print("---------------------data--------", data)
-            
-
 
             return render(request, 'core/index.html', data )
 
