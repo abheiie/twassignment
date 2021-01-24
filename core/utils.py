@@ -32,7 +32,7 @@ def check_number_of_request_per_minute(request):
             last request was within a minute
             """
 
-            if session_data.get("request_count") <= 5:
+            if session_data.get("request_count") <= 5000:
                 """
                 if request_count is less than permissible number of request_count
                 """
@@ -87,7 +87,7 @@ def check_number_of_request_per_day(request):
             
             print((now - session_data.get("previous_check_time")).total_seconds())
 
-            if session_data.get("request_count") <= 100:
+            if session_data.get("request_count") <= 5000:
                 """
                 if request_count is less than permissible number of request_count
                 """

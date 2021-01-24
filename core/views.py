@@ -1,7 +1,6 @@
 from django.shortcuts import render
 import requests
 import json 
-from bunch import bunchify
 from django.core.cache import cache
 import datetime
 from .utils import check_number_of_request_per_minute
