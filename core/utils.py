@@ -1,4 +1,7 @@
 import datetime
+number_of_requests_per_minute = 5
+number_of_requests_per_day = 100
+
 
 def check_number_of_request_per_minute(request):
     """
@@ -22,17 +25,15 @@ def check_number_of_request_per_minute(request):
         request.session['per_minute_check'] = per_minut_value
 
     else:
-
         now = datetime.datetime.now()
         session_data = request.session.get('per_minute_check')
-        print(".."*40, (now - session_data.get("previous_check_time")).total_seconds())
 
         if (now - session_data.get("previous_check_time")).total_seconds() <= 60:
             """
             last request was within a minute
             """
 
-            if session_data.get("request_count") <= 5000:
+            if session_data.get("request_count") <= number_of_requests_per_minute:
                 """
                 if request_count is less than permissible number of request_count
                 """
@@ -78,16 +79,11 @@ def check_number_of_request_per_day(request):
     else:
         session_data = request.session.get('per_day_check')
         now = datetime.datetime.now()
-        print(request.session.get('per_day_check'))
-        print("total seconds", (now - session_data.get("previous_check_time")).total_seconds())
         if (now - session_data.get("previous_check_time")).total_seconds() <= 86400:
             """
             last request was within a day
             """
-            
-            print((now - session_data.get("previous_check_time")).total_seconds())
-
-            if session_data.get("request_count") <= 5000:
+            if session_data.get("request_count") <= number_of_requests_per_day:
                 """
                 if request_count is less than permissible number of request_count
                 """

@@ -14,7 +14,7 @@ def search_question(request):
         """
         get the POST request
         """
-        
+
         is_request_allowable_for_per_day = check_number_of_request_per_day(request)
         is_request_allowable_for_per_minute = check_number_of_request_per_minute(request)
 

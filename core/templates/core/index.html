@@ -21,8 +21,20 @@
         localStorage.setItem('search_query', search_query);
     </script>
 
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="https://recruiterflow.com/blog/wp-content/uploads/2017/10/stackoverflow.png" alt="" width="30" height="24" class="d-inline-block align-top">
+            StackOverflowAPI App
+        </a>
+        </div>
+    </nav>
+
 
     <div class="container">
+
+        <!-- Image and text -->
+        
 
         <div style="margin-top: 40px;">
 
@@ -112,7 +124,10 @@
             <div class="result">
 
                 {% if status %}
-                {{status}}
+                <div class="alert alert-danger" role="alert">
+                    {{status}}
+                </div>
+                
                 {% elif items_not_present %}
                 <div class="alert alert-danger" role="alert">
                     No items found please try again with some other keyword
@@ -128,13 +143,9 @@
                 </div>
                 <br>
                 {% endfor%}
-
                 {% if show_pagination %}
 
-
-
                 <nav aria-label="Page navigation example">
-
                     <ul class="pagination">
 
                         {% if not is_first_page %}
